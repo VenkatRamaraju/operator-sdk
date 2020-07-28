@@ -186,6 +186,25 @@ func (r *AnsibleOperatorReconciler) Reconcile(request reconcile.Request) (reconc
 				return reconcile.Result{}, err
 			}
 		}
+
+		if module, found := event.EventData["task_action"]; found {
+			if module == "operator_sdk.util.requeue_after" {
+				if data, exists := event.EventData["res"]; exists {
+					if fields, check := data.(map[string]interface{}); check {
+						requeueDuration, err := time.ParseDuration(fields["period"].(string))
+						if err != nil {
+							fmt.Println(err)
+							return reconcileResult, err
+						} else {
+							reconcileResult.RequeueAfter = requeueDuration
+							fmt.Println("Set the reconcilation to occur after", requeueDuration)
+							return reconcileResult, nil
+						}
+					}
+				}
+			}
+		}
+
 		if event.Event == eventapi.EventRunnerOnFailed && !event.IgnoreError() {
 			failureMessages = append(failureMessages, event.GetFailedPlaybookMessage())
 		}
