@@ -195,11 +195,10 @@ func (r *AnsibleOperatorReconciler) Reconcile(request reconcile.Request) (reconc
 						if err != nil {
 							fmt.Println(err)
 							return reconcileResult, err
-						} else {
-							reconcileResult.RequeueAfter = requeueDuration
-							fmt.Println("Set the reconcilation to occur after", requeueDuration)
-							return reconcileResult, nil
 						}
+						reconcileResult.RequeueAfter = requeueDuration
+						fmt.Println("Set the reconciliation to occur after", requeueDuration)
+						return reconcileResult, nil
 					}
 				}
 			}
